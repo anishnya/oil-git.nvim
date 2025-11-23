@@ -18,22 +18,8 @@ local function setup_highlights()
 	end
 end
 
-local function get_git_root(path)
-	local git_dir = vim.fn.finddir(".git", path .. ";")
-	if git_dir == "" then
-		return nil
-	end
-	-- Get the parent directory of .git, not .git itself
-	return vim.fn.fnamemodify(git_dir, ":p:h:h")
-end
-
 local function get_git_status(dir)
-	local git_root = get_git_root(dir)
-	if not git_root then
-		return {}
-	end
-
-	local cmd = string.format("cd %s && git status --porcelain --ignored", vim.fn.shellescape(git_root))
+	local cmd = string.format("cd %s && git status --porcelain --ignored", vim.fn.shellescape(dir))
 	local output = vim.fn.system(cmd)
 
 	if vim.v.shell_error ~= 0 then
@@ -60,7 +46,7 @@ local function get_git_status(dir)
 			end
 
 			-- Convert to absolute path
-			local abs_path = git_root .. "/" .. filepath
+			local abs_path = "/" .. filepath
 
 			status[abs_path] = status_code
 		end
